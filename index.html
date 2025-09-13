@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multifindr AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Search Bar Container */
+    .search-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 800px;
+      margin: auto;
+      position: relative;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 12px 50px;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 16px;
+    }
+
+    /* Inside Left (Voice + AI buttons) */
+    .left-buttons {
+      position: absolute;
+      left: 10px;
+      display: flex;
+      gap: 5px;
+    }
+
+    /* Inside Right (Dropdown) */
+    .right-dropdown {
+      position: absolute;
+      right: 10px;
+    }
+
+    select {
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    /* Bottom icons row */
+    .icons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 22px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    /* Search results (like ChatGPT/Gemini) */
+    .results {
+      max-width: 800px;
+      margin: 20px auto;
+      text-align: left;
+    }
+
+    .result-item {
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+
+  <!-- Search Section -->
+  <div class="search-container">
+    <div class="left-buttons">
+      <button>🎤</button>
+      <button>🤖</button>
+    </div>
+    <input type="text" id="searchInput" class="search-bar" placeholder="Ask anything...">
+    <div class="right-dropdown">
+      <select id="engineS">
+        <option>Google</option>
+        <option>Bing</option>
+        <option>Yahoo</option>
+        <option>DuckDuckGo</option>
+        <option>Ask</option>
+        <option>Yandex</option>
+        <option>Baidu</option>
+        <option>Ecosia</option>
+        <option>AOL</option>
+        <option>StartPage</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Bottom Icons -->
+  <div class="icons">
+    <span>🌍</span>
+    <span>🎤</span>
+    <span>🤖</span>
+    <span>🎨</span>
+    <span>🖼️</span>
+    <span>🎥</span>
+    <span>📷</span>
+    <span>🌐</span>
+  </div>
+
+  <!-- Results Section -->
+  <div class="results" id="results"></div>
+
+</head>
+<body>
+        <div class="container">
+    <h2>🔍 Multifindr with AI, Voice, Images, and More</h2>
+
+    <div> const input = document.getElementById("searchInput");</div>
+   <div> const resultsDiv = document.getElementById("results");</div>
+
+<script>
+        input.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        const query = input.value.trim();
+        if (query) {
+          const div = document.createElement("div");
+          div.className = "result-item";
+          div.textContent = "🔎 Result for: " + query;
+          resultsDiv.prepend(div); // latest result upar se niche aayega
+          input.value = "";
+        }
+      }
+    });
+  </script>
+
+      <select id="language">
+        <option value="en">🇺🇸 English</option>
+        <option value="es">🇪🇸 Spanish</option>
+        <option value="fr">🇫🇷 French</option>
+        <option value="hi">🇮🇳 Hindi</option>
+        <option value="zh">🇨🇳 Chinese</option>
+        <option value="ar">🇸🇦 Arabic</option>
+      </select>
+    </div>
+
+    <div class="search-bar">
+      <span class="icon-left" onclick="startRecording()">🎤</span>
+      <input type="text" id="searchInput" placeholder="Search or ask anything...">
+      <button class="icon-right" onclick="askAI()">🤖</button>
+    </div>
+
+<!-- Icon Bar -->
+<!-- Icon Bar -->
+<div class="icon-bar">
+  <span onclick="performSearch()" title="Search">🌐</span>
+  <span onclick="recordAndTranscribe()" title="Voice">🎤</span>
+  <span onclick="sendToGemini()" title="Ask AI">🤖</span>
+  <span onclick="openArt()" title="Art">🎨</span>
+  <span onclick="openImage()" title="Image">🖼</span>
+  <span onclick="openVideo()" title="Video">🎥</span>
+  <span onclick="openCamera()" title="Camera">📷</span>
+  <span onclick="openMap()" title="Map">🗺</span>
+</div>
+
+<!-- CHAT style scrollable results area -->
+<div id="chatArea" class="chat-area"></div>
+
+  <script>
+    // AI query
+    async function askAI() {
+      const query = document.getElementById("searchInput").value;
+      if (!query) return;
+      const res = await fetch("/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: query })
+      });
+      const data = await res.json();
+      document.getElementById("results").innerText = data.response || data.error;
+    }
+
+    // Search query
+    async function performSearch() {
+      const query = document.getElementById("searchInput").value;
+      const engine = document.getElementById("engine").value;
+      if (!query) return;
+      const res = await fetch(`/search?q=${encodeURIComponent(query)}&engine=${engine}`);
+      const data = await res.json();
+      document.getElementById("results").innerText = data.result;
+    }
+
+    // Image generation
+    async function generateImage() {
+      const prompt = document.getElementById("searchInput").value;
+      if (!prompt) return;
+      const res = await fetch("/image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      document.getElementById("results").innerHTML = `<img src="${data.url}" width="100%" />`;
+    }
+
+    // Video generation
+    async function generateVideo() {
+      const prompt = document.getElementById("searchInput").value;
+      if (!prompt) return;
+      const res = await fetch("/video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      document.getElementById("results").innerHTML = `<video width="100%" controls src="${data.url}"></video>`;
+    }
+
+    // Voice to text using Whisper
+    let mediaRecorder;
+    let audioChunks = [];
+
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+
+      mediaRecorder.start();
+
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append("audio", audioBlob, "audio.webm");
+
+        const res = await fetch("/whisper", { method: "POST", body: formData });
+        const data = await res.json();
+        const text = data?.predictions?.[0]?.output || "Could not recognize speech";
+        document.getElementById("searchInput").value = text;
+        askAI(); // auto ask
+      };
+
+      setTimeout(() => mediaRecorder.stop(), 3000);
+    }
+  </script>
+</body>
+</html>
