@@ -1,0 +1,17 @@
+# Web framework
+flask
+
+# Google Gemini AI
+google-generativeai
+
+# API requests
+requests
+
+# For handling file uploads (audio etc.)
+werkzeug
+
+# Deployment server (Render / Railway / etc.)
+gunicorn
+
+# (Optional) For environment variables
+python-dotenv
