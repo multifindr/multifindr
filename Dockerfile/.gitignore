@@ -1,0 +1,22 @@
+# --- Environment variables ---
+.env
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# --- Logs ---
+*.log
+
+# --- Node / Tailwind ---
+node_modules/
+static/css/output.css
+
+# --- OS / Editor junk ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
